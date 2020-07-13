@@ -8,8 +8,8 @@ export class UserService {
 
   constructor() {
     this.users = [
-    { userId: 1, username: 'john', passsword: 'changeme' },
-    { userId: 2, username: 'john2', passsword: 'changeme' }];
+    { userId: 1, username: 'john', password: 'changeme' },
+    { userId: 2, username: 'john2', password: 'changeme' }];
   }
 
   async findOne(username: string): Promise<User | undefined> {

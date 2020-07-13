@@ -2,9 +2,9 @@
     "type": "mysql",
     "host": "localhost",
     "port": 3306,
-    "username": "root",
-    "password": "root",
-    "database": "test",
+    "username": "admin",
+    "password": "admin",
+    "database": "nest_jwt",
     "entities": ["dist/**/*.entity{.ts,.js}"],
     "synchronize": true
   }
