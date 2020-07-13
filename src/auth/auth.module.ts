@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport/dist/passport.module';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from 'SECRET_CONSTANTS';
+import { jwtConstants } from '../../constants';
 
 @Module({
   imports: [UserModule, PassportModule,
