@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+SECRET_CONSTANT.ts
 
 # Logs
 logs
