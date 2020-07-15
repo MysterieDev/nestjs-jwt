@@ -1,10 +1,10 @@
 import { UserService } from './../user/user.service';
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, Role } from 'src/user/models/user.entity';
 import { UserDto, LoginDto } from 'src/user/models/user.dto';
+import { SQL_ERROR } from 'src/utils/error-codes';
 import * as bcrypt from "bcrypt";
-
 @Injectable()
 export class AuthService {
     
@@ -29,7 +29,7 @@ export class AuthService {
     }
 
     async login(user: User){
-        const payload = { username: user.username, sub: user.id, role: user.role };
+        const payload = { username: user.username, id: user.id, role: user.role };
         return {
           access_token: this.jwtService.sign(payload),
         };
@@ -39,13 +39,27 @@ export class AuthService {
     async signUp(user: UserDto){
         const {username, email, password} = user;
         const newUser = new User(); 
+        const salt = await bcrypt.genSalt();
         newUser.username = username;
-        newUser.salt = await bcrypt.genSalt();
-        newUser.password = await this.hashPassword(password, newUser.salt);
+        newUser.salt = salt
+        newUser.password = await this.hashPassword(password, salt);
+        console.log(newUser.password);
         newUser.email = email;
         newUser.role = Role.User;
 
-        return this.userService.insertOne(newUser);
+        try{
+            const user = await this.userService.insertOne(newUser);
+            return user;
+        } catch(e){
+            if(e.code === SQL_ERROR.DUPLICATE){
+                throw new ConflictException("User or Email already exists")
+            } else {
+                throw new InternalServerErrorException();
+            }
+        }
+
+
+        return 
     }
 
     private async hashPassword(password: string, salt: string): Promise<string>{
