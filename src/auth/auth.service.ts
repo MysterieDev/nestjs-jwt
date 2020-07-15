@@ -1,9 +1,9 @@
 import { UserService } from './../user/user.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, Role } from 'src/user/models/user.entity';
 import { UserDto, LoginDto } from 'src/user/models/user.dto';
-
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
@@ -13,11 +13,19 @@ export class AuthService {
 
     async validateUser(loginData: LoginDto): Promise<any>{
         const user = await this.userService.findOne(loginData.username);
-        if(user && user.password === loginData.password) {
-            const { password, ...result } = user;
+        if(user){
+        const hashedPassword = await this.hashPassword(loginData.password, user.salt);
+        if(user && user.password === hashedPassword) {
+            const { password, salt, ...result } = user;
             return result;
         }
-        return null;
+        else{
+            return null;
+        }
+        }
+        else {
+            throw new NotFoundException()
+        }
     }
 
     async login(user: User){
@@ -30,11 +38,17 @@ export class AuthService {
 
     async signUp(user: UserDto){
         const {username, email, password} = user;
-        const newUser = new User();
+        const newUser = new User(); 
         newUser.username = username;
-        newUser.password = password;
+        newUser.salt = await bcrypt.genSalt();
+        newUser.password = await this.hashPassword(password, newUser.salt);
         newUser.email = email;
         newUser.role = Role.User;
+
         return this.userService.insertOne(newUser);
+    }
+
+    private async hashPassword(password: string, salt: string): Promise<string>{
+        return bcrypt.hash(password, salt)
     }
 }

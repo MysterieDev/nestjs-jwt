@@ -18,6 +18,9 @@ export class User {
 
     @Column()
     role: Role
+
+    @Column() 
+    salt: string;
 }
 
 export enum Role{
