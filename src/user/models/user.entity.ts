@@ -2,9 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, Unique, BaseEntity } from "type
 
 
 @Entity()
+@Unique(['email', 'username'])
 export class User {
-    @Unique(["username", "email"])
-
     @PrimaryGeneratedColumn()
     id: number;
 
