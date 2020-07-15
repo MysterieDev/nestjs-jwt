@@ -1,29 +1,34 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, BaseEntity } from "typeorm";
-
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Unique,
+  BaseEntity,
+  Index,
+} from 'typeorm';
 
 @Entity()
-@Unique(['email', 'username'])
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
+  @Index({ unique: true })
+  @Column()
+  email: string;
+  @Index({ unique: true })
+  @Column()
+  username: string;
 
-    @Column()
-    email: string; 
+  @Column()
+  password: string;
 
-    @Column()
-    username: string;
+  @Column()
+  role: Role;
 
-    @Column()
-    password: string;
-
-    @Column()
-    role: Role
-
-    @Column() 
-    salt: string;
+  @Column()
+  salt: string;
 }
 
-export enum Role{
-    Admin = "ADMIN",
-    User = "USER"
+export enum Role {
+  Admin = 'ADMIN',
+  User = 'USER',
 }

@@ -8,10 +8,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, Role } from 'src/user/models/user.entity';
-import { UserDto } from 'src/user/models/user.dto';
 import { SQL_ERROR } from 'src/utils/error-codes';
 import * as bcrypt from 'bcrypt';
-import { LoginDto } from './models/auth.dto';
+import { LoginDto, RegisterDto } from './models/auth.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -30,7 +29,7 @@ export class AuthService {
         const { password, salt, ...result } = user;
         return result;
       } else {
-        return null;
+        throw new UnauthorizedException('Invalid Login Credentials');
       }
     } else {
       throw new NotFoundException();
@@ -44,7 +43,7 @@ export class AuthService {
     };
   }
 
-  async signUp(user: UserDto) {
+  async signUp(user: RegisterDto) {
     const { username, email, password } = user;
     const newUser = new User();
     const salt = await bcrypt.genSalt();
