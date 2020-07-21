@@ -45,19 +45,21 @@ export class AuthService {
   }
 
   async signUp(user: RegisterDto) {
+    console.log(user);
+
     const { username, email, password } = user;
     const newUser = new User();
     const salt = await bcrypt.genSalt();
     newUser.username = username;
     newUser.salt = salt;
     newUser.password = await this.hashPassword(password, salt);
-    console.log(newUser.password);
     newUser.email = email;
     newUser.role = Role.User;
 
     try {
-      const user = await this.userService.insertOne(newUser);
-      return user;
+      let user = await this.userService.insertOne(newUser);
+      const { password, salt, role, id, ...result } = user;
+      return result;
     } catch (e) {
       if (e.code === SQL_ERROR.DUPLICATE) {
         throw new ConflictException('User or Email already exists');
