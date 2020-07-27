@@ -4,16 +4,9 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { AuthService } from './auth/auth.service';
-import { Connection } from 'typeorm';
-
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(),
-    AuthModule,
-    UserModule,
-  ],
+  imports: [TypeOrmModule.forRoot(), AuthModule, UserModule],
   controllers: [AppController],
   providers: [AppService],
 })
