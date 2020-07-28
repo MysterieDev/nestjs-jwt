@@ -13,8 +13,12 @@ export class UserService {
     return this.userRepository.findOne({ username: username });
   }
 
-  async findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(): Promise<Partial<User>[]> {
+    const allUsers = await this.userRepository.find();
+    return allUsers.map(user => {
+      const { password, salt, ...result } = user;
+      return result;
+    });
   }
 
   async insertOne(user: User): Promise<User> {
