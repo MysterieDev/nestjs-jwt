@@ -5,9 +5,10 @@ import {
   ValidationPipe,
   UseGuards,
   Request,
+  Get,
 } from '@nestjs/common';
 import { RegisterDto } from './models/auth.dto';
-import { LocalAuthGuard } from './auth-guards';
+import { LocalAuthGuard, JwtAuthGuard } from './auth-guards';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -23,5 +24,11 @@ export class AuthController {
   @Post('login')
   async login(@Request() req) {
     return this.authService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('role')
+  async getRole(@Request() req) {
+    return this.authService.getRole(req.user.username);
   }
 }

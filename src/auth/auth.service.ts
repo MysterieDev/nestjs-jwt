@@ -18,6 +18,15 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  async getRole(username: string) {
+    const user = await this.userService.findOne(username);
+    if (user) {
+      return { role: user.role };
+    } else {
+      throw new NotFoundException();
+    }
+  }
+
   async validateUser(loginData: LoginDto): Promise<any> {
     const user = await this.userService.findOne(loginData.username);
     if (user) {
