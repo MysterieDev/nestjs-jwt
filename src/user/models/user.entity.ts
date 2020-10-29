@@ -32,3 +32,10 @@ export enum Role {
   Admin = 'ADMIN',
   User = 'USER',
 }
+
+export interface SafeUser {
+  id: number;
+  email: string;
+  username: string;
+  role: Role
+}

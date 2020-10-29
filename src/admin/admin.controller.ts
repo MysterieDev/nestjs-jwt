@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from 'src/auth/auth-guards';
+import { Role } from 'src/user/models/user.entity';
 
 @Controller('admin')
 export class AdminController {
@@ -15,12 +16,9 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   @Get('users/all')
   async getallUsers(@Req() req) {
-    const requestingUser = await this.userService.findOne(req.user.username);
-    const { role, ...user } = requestingUser;
-    if (role === 'ADMIN') {
+    const requestingUser = await this.userService.findOneAndCheckRole(req.user.username, Role.Admin);
+    if (requestingUser) {
       return await this.userService.findAll();
-    } else {
-      throw new UnauthorizedException();
-    }
   }
+}
 }

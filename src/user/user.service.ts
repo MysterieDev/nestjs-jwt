@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './models/user.entity';
+import { Role, User } from './models/user.entity';
 import { Repository } from 'typeorm';
+import { SafeUser } from '../user/models/user.entity';
+import { SafeUser } from '../../dist/src/user/models/user.entity';
 
 @Injectable()
 export class UserService {
@@ -9,15 +11,34 @@ export class UserService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
+  async findOneAndGetSafe(username: string): Promise<SafeUser | undefined> {
+    const user = await this.userRepository.findOne({ username: username });
+    return user ? this.getSafeUser(user): undefined;
+  }
+
   async findOne(username: string): Promise<User | undefined> {
     return this.userRepository.findOne({ username: username });
   }
 
-  async findAll(): Promise<Partial<User>[]> {
+
+  async findOneAndCheckRole(username: string, role: Role): Promise<SafeUser> {
+   const user = await this.userRepository.findOne({ username: username });
+   if (user && user.role === role){
+     return this.getSafeUser(user);
+   }
+   else if(user){
+     throw new UnauthorizedException();
+   }
+   else{
+     throw new NotFoundException("User was not found");
+   }
+  }
+
+  async findAll(): Promise<SafeUser[]> {
     const allUsers = await this.userRepository.find();
     return allUsers.map(user => {
-      const { password, salt, ...result } = user;
-      return result;
+      const safeUser = this.getSafeUser(user);
+      return safeUser;
     });
   }
 
@@ -28,4 +49,15 @@ export class UserService {
   async remove(id: string): Promise<void> {
     await this.userRepository.delete(id);
   }
+
+  /**
+   * Takes in a user and returns all properties that dont expose
+   * critical information such as password and salt
+   * @param user User that is to be processed
+   */
+  private getSafeUser(user: User){
+    const { password, salt, ...result } = user;
+    return result;
+  }
+
 }
