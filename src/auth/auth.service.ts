@@ -11,6 +11,12 @@ import { User, Role } from 'src/user/models/user.entity';
 import { SQL_ERROR } from 'src/utils/error-codes';
 import * as bcrypt from 'bcrypt';
 import { LoginDto, RegisterDto } from './models/auth.dto';
+/**
+ * This service provides Basic Authentication Utilities.
+ * This App uses a combination of the Local and the JWT Passport Strategies
+ * First, we use a Local Strategy to look up the User in the database, then
+ * we sign the jwt token and verify it. The secret and the expiration is defined in the module
+ */
 @Injectable()
 export class AuthService {
   constructor(
@@ -27,6 +33,11 @@ export class AuthService {
     }
   }
 
+  /**
+   * Needed for the Local Passport Strategy
+   * Checks for the user in the database
+   * @param loginData the DTO for the Login data consisting of username and password
+   */
   async validateUser(loginData: LoginDto): Promise<any> {
     const user = await this.userService.findOne(loginData.username);
     if (user) {
@@ -45,6 +56,10 @@ export class AuthService {
     }
   }
 
+  /**
+   * Signs the payload for the JWT
+   * @param user the req user object
+   */
   async login(user: User) {
     const payload = { username: user.username, id: user.id, role: user.role };
     return {

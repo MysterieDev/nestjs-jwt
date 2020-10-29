@@ -20,6 +20,10 @@ export class AuthController {
     return this.authService.signUp(body);
   }
 
+/**
+ * Here we use the Local Strategy for username/password lookup
+ * If that is succesfull, we can sign payload for a jwt
+ */
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req) {
