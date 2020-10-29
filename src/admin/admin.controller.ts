@@ -18,7 +18,16 @@ export class AdminController {
   async getallUsers(@Req() req) {
     const requestingUser = await this.userService.findOneAndCheckRole(req.user.username, Role.Admin);
     if (requestingUser) {
-      return await this.userService.findAll();
+      return await this.userService.findAllWithRole(Role.User);
   }
+}
+
+@UseGuards(JwtAuthGuard)
+@Get('admins/all')
+async getAllAdmins(@Req() req) {
+  const requestingUser = await this.userService.findOneAndCheckRole(req.user.username, Role.Admin);
+  if (requestingUser) {
+    return await this.userService.findAllWithRole(Role.Admin);
+}
 }
 }

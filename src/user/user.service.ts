@@ -19,20 +19,6 @@ export class UserService {
     return this.userRepository.findOne({ username: username });
   }
 
-
-  async findOneAndCheckRole(username: string, role: Role): Promise<SafeUser> {
-   const user = await this.userRepository.findOne({ username: username });
-   if (user && user.role === role){
-     return this.getSafeUser(user);
-   }
-   else if(user){
-     throw new UnauthorizedException();
-   }
-   else{
-     throw new NotFoundException("User was not found");
-   }
-  }
-
   async findAll(): Promise<SafeUser[]> {
     const allUsers = await this.userRepository.find();
     return allUsers.map(user => {
@@ -48,6 +34,37 @@ export class UserService {
   async remove(id: string): Promise<void> {
     await this.userRepository.delete(id);
   }
+
+  /**
+   * Checks the role of a given users against the role parameter
+   * @param username the username
+   * @param role the role to check the user against
+   */
+  async findOneAndCheckRole(username: string, role: Role): Promise<SafeUser> {
+    const user = await this.userRepository.findOne({ username: username });
+    if (user && user.role === role){
+      return this.getSafeUser(user);
+    }
+    else if(user){
+      throw new UnauthorizedException();
+    }
+    else{
+      throw new NotFoundException("User was not found");
+    }
+   }
+ /**
+  * Returns an Array of All Users with the given role
+  * @param role The desired role group
+  */
+   async findAllWithRole(role: Role): Promise<SafeUser[]> {
+     const allUsers = await this.userRepository.find();
+     return allUsers
+     .filter(user => user.role === role)
+     .map(user => {
+       const safeUser = this.getSafeUser(user);
+       return safeUser;
+     });
+   }
 
   /**
    * Takes in a user and returns all properties that dont expose
