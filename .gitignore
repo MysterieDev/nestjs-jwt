@@ -38,3 +38,4 @@ constants.ts
 
 #db
 ormconfig.json
+ormconfig-default.json

@@ -7,7 +7,7 @@ import {
   Request,
   Get,
 } from '@nestjs/common';
-import { RegisterDto } from './models/auth.dto';
+import { RegisterUserDto } from './models/auth.dto';
 import { LocalAuthGuard, JwtAuthGuard } from './auth-guards';
 import { AuthService } from './auth.service';
 
@@ -16,14 +16,14 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('signup')
-  async signUp(@Body(ValidationPipe) body: RegisterDto) {
+  async signUp(@Body(ValidationPipe) body: RegisterUserDto) {
     return this.authService.signUp(body);
   }
 
-/**
- * Here we use the Local Strategy for username/password lookup
- * If that is succesfull, we can sign payload for a jwt
- */
+  /**
+   * Here we use the Local Strategy for username/password lookup
+   * If that is succesfull, we can sign payload for a jwt
+   */
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req) {

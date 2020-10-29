@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User, Role } from 'src/user/models/user.entity';
 import { SQL_ERROR } from 'src/utils/error-codes';
 import * as bcrypt from 'bcrypt';
-import { LoginDto, RegisterDto } from './models/auth.dto';
+import { LoginDto, RegisterUserDto } from './models/auth.dto';
 /**
  * This service provides Basic Authentication Utilities.
  * This App uses a combination of the Local and the JWT Passport Strategies
@@ -68,9 +68,7 @@ export class AuthService {
     };
   }
 
-  async signUp(user: RegisterDto) {
-    console.log(user);
-
+  async signUp(user: RegisterUserDto) {
     const { username, email, password } = user;
     const newUser = new User();
     // Every user has its salt saved in the database

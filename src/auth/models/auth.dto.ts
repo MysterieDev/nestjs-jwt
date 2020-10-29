@@ -11,7 +11,7 @@ export interface LoginDto {
   password: string;
 }
 
-export class RegisterDto {
+export class RegisterUserDto {
   @IsString()
   @MinLength(4)
   @MaxLength(20)
@@ -26,4 +26,13 @@ export class RegisterDto {
   })
   password: string;
   role?: Role;
+}
+
+export class UpdateUserDataDto {
+  @IsString()
+  @MinLength(4)
+  @MaxLength(20)
+  username: string;
+  @IsEmail()
+  email: string;
 }
