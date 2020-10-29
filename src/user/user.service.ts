@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Role, User } from './models/user.entity';
 import { Repository } from 'typeorm';
 import { SafeUser } from '../user/models/user.entity';
-import { SafeUser } from '../../dist/src/user/models/user.entity';
 
 @Injectable()
 export class UserService {
