@@ -73,6 +73,8 @@ export class AuthService {
 
     const { username, email, password } = user;
     const newUser = new User();
+    // Every user has its salt saved in the database
+    // This is save as its encrypted with bcrypt
     const salt = await bcrypt.genSalt();
     newUser.username = username;
     newUser.salt = salt;
