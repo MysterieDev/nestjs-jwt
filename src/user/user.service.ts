@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -19,15 +20,16 @@ export class UserService {
 
   async findOneAndGetSafe(username: string): Promise<SafeUser> {
     const user = await this.userRepository.findOne({ username: username });
-    if (user) {
-      return user;
-    } else {
-      throw new NotFoundException();
-    }
+    const { password, salt, ...result } = user;
+    return result;
   }
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ username: username });
+  async findOne(username: string): Promise<User> {
+    const user = await this.userRepository.findOne({ username: username });
+    if (!user) {
+      throw new ForbiddenException('User was not found');
+    }
+    return user;
   }
 
   async findAll(): Promise<SafeUser[]> {
@@ -42,10 +44,6 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async updateOne(user: User, data: Partial<SafeUser>): Promise<User> {
-    return this.userRepository.save({ ...user, ...data });
-  }
-
   async remove(id: string): Promise<void> {
     await this.userRepository.delete(id);
   }
@@ -53,10 +51,10 @@ export class UserService {
   async updateUser(username: string, updateData: Partial<UpdateUserDataDto>) {
     const oldUser = await this.findOne(username);
     if (!oldUser) {
-      throw new NotFoundException();
+      throw new ForbiddenException('User was not found');
     }
     try {
-      let user = await this.updateOne(oldUser, updateData);
+      let user = await this.userRepository.save({ ...oldUser, ...updateData });
       const { password, salt, role, id, ...result } = user;
       return result;
     } catch (e) {
@@ -80,7 +78,7 @@ export class UserService {
     } else if (user) {
       throw new UnauthorizedException();
     } else {
-      throw new NotFoundException('User was not found');
+      throw new ForbiddenException('User was not found');
     }
   }
   /**
